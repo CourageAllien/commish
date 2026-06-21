@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
   const payload = {
     from,
-    to: ['courage@couragealison.com'],
+    to: ['couragealison6@gmail.com'],
     subject: `New onboarding — ${company}`,
     html,
     text,
