@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Commish — Client Onboarding</title>
+<meta name="description" content="Tell us about your business and pick how we partner: commission per deal, revenue share, or equity." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0E1320;--ink-2:#141B2B;--surface:#19223550;--surface-solid:#161E30;
+    --line:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.14);
+    --gold:#E8B23A;--gold-bright:#F4C95B;--go:#4CC09A;
+    --text:#ECEEF4;--muted:#97A1B4;--faint:#6A7384;--err:#E8736A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--ink);color:var(--text);font-family:"Inter",system-ui,sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:radial-gradient(800px 480px at 88% -8%,rgba(232,178,58,.10),transparent 60%),radial-gradient(640px 460px at -5% 8%,rgba(76,192,154,.05),transparent 55%)}
+  h1,h2,h3,.display{font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:800;letter-spacing:-.02em;line-height:1.08}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  .brand{display:flex;align-items:center;gap:11px;font-family:"Bricolage Grotesque";font-weight:800;font-size:21px;letter-spacing:-.02em}
+  .brand-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#b9831e);display:grid;place-items:center;color:#241a06;font-weight:800;font-size:16px}
+
+  .app{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+  @media(max-width:860px){.app{grid-template-columns:1fr}}
+
+  /* sidebar */
+  .side{border-right:1px solid var(--line);padding:30px 26px;position:sticky;top:0;align-self:start;height:100vh;background:rgba(20,27,43,.4)}
+  @media(max-width:860px){.side{display:none}}
+  .side .lede{color:var(--muted);font-size:13.5px;margin:24px 0 26px}
+  .snav{list-style:none;display:flex;flex-direction:column;gap:4px}
+  .snav li{display:flex;gap:13px;align-items:flex-start;padding:11px 12px;border-radius:10px;cursor:pointer;transition:.15s;color:var(--muted)}
+  .snav li:hover{background:rgba(255,255,255,.03)}
+  .snav li.active{background:rgba(232,178,58,.08);color:var(--text)}
+  .snav li.done{color:var(--text)}
+  .snav .bdg{flex:none;width:24px;height:24px;border-radius:7px;border:1px solid var(--line-strong);display:grid;place-items:center;
+    font-family:"IBM Plex Mono";font-size:12px;color:var(--faint)}
+  .snav li.active .bdg{background:var(--gold);border-color:var(--gold);color:#231a05}
+  .snav li.done .bdg{background:var(--go);border-color:var(--go);color:#06231a}
+  .snav .st{font-size:14px;font-weight:500;padding-top:2px}
+
+  /* main */
+  .main{padding:46px clamp(22px,5vw,64px) 60px;max-width:820px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .mobrand{display:none}
+  @media(max-width:860px){.mobrand{display:flex}}
+  .stepof{font-family:"IBM Plex Mono";font-size:12.5px;letter-spacing:.08em;color:var(--gold);text-transform:uppercase}
+  .pbar{height:4px;border-radius:4px;background:rgba(255,255,255,.08);margin:14px 0 38px;overflow:hidden}
+  .pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-bright));border-radius:4px;transition:width .35s ease;width:14%}
+
+  .sec{display:none;animation:fade .35s ease}
+  .sec.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .sec .kicker{font-family:"IBM Plex Mono";font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .sec h2{font-size:clamp(26px,4.5vw,38px);margin:10px 0 6px}
+  .sec .sub{color:var(--muted);font-size:16px;margin-bottom:30px;max-width:60ch}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:620px){.grid2{grid-template-columns:1fr}}
+  .field{margin-bottom:20px}
+  .field.full{grid-column:1/-1}
+  .field label{display:block;font-size:14px;font-weight:500;margin-bottom:8px}
+  .field label .req{color:var(--gold)}
+  .field .hint{display:block;color:var(--faint);font-size:12.5px;font-weight:400;margin-top:2px}
+  .field input,.field textarea,.field select{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--line);
+    border-radius:11px;padding:13px 15px;color:var(--text);font-family:"Inter";font-size:15px;outline:none;transition:.15s}
+  .field textarea{resize:vertical;min-height:92px}
+  .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold);background:rgba(232,178,58,.04)}
+  .field input::placeholder,.field textarea::placeholder{color:var(--faint)}
+  .field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2397A1B4' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 15px center}
+  .field.err input,.field.err textarea,.field.err select{border-color:var(--err)}
+  .field.err label{color:var(--err)}
+
+  /* model cards */
+  .models{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:8px}
+  @media(max-width:720px){.models{grid-template-columns:1fr}}
+  .mcard{border:1px solid var(--line);border-radius:15px;padding:22px 20px;cursor:pointer;transition:.16s;position:relative;background:var(--surface)}
+  .mcard:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+  .mcard.sel{border-color:var(--gold);background:linear-gradient(180deg,rgba(232,178,58,.08),transparent)}
+  .mcard .tick{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center;font-size:13px;color:transparent}
+  .mcard.sel .tick{background:var(--gold);border-color:var(--gold);color:#231a05}
+  .mcard .tg{font-family:"IBM Plex Mono";font-size:11px;color:var(--gold);letter-spacing:.08em}
+  .mcard h3{font-family:"Bricolage Grotesque";font-size:19px;margin:9px 0 6px}
+  .mcard .pay{font-family:"IBM Plex Mono";font-size:12px;color:var(--go);margin-bottom:10px}
+  .mcard p{color:var(--muted);font-size:13.5px}
+  .cond{display:none;border-top:1px solid var(--line);margin-top:24px;padding-top:24px}
+  .cond.on{display:block;animation:fade .3s ease}
+  .pick4{border:1px dashed var(--line-strong);border-radius:12px;padding:16px 18px;margin-top:14px;color:var(--muted);font-size:13.5px}
+  .pick4.sel{border-style:solid;border-color:var(--gold);color:var(--text)}
+
+  /* nav buttons */
+  .nav{display:flex;justify-content:space-between;gap:14px;margin-top:38px;padding-top:26px;border-top:1px solid var(--line)}
+  .btn{display:inline-flex;align-items:center;gap:9px;justify-content:center;font-weight:600;font-size:15px;padding:13px 24px;border-radius:11px;border:1px solid transparent;cursor:pointer;transition:.16s;font-family:"Inter"}
+  .btn-gold{background:var(--gold);color:#231a05}
+  .btn-gold:hover{background:var(--gold-bright)}
+  .btn-ghost{border-color:var(--line-strong);color:var(--text);background:transparent}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+
+  /* done screen */
+  .done{display:none;text-align:center;padding:30px 0}
+  .done.on{display:block;animation:fade .4s ease}
+  .done .seal{width:66px;height:66px;border-radius:50%;background:rgba(76,192,154,.16);color:var(--go);display:grid;place-items:center;font-size:30px;margin:0 auto 22px}
+  .done h2{font-size:clamp(28px,5vw,40px)}
+  .done p{color:var(--muted);max-width:50ch;margin:14px auto 0}
+  .summary{text-align:left;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:22px;margin:28px auto 0;max-width:620px}
+  .summary h4{font-family:"IBM Plex Mono";font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+  .summary .r{display:flex;gap:14px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+  .summary .r:first-of-type{border-top:none}
+  .summary .r .k{color:var(--faint);min-width:170px;flex:none}
+  .summary .r .v{color:var(--text)}
+  .note{color:var(--faint);font-size:12.5px;margin-top:18px}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="side">
+    <div class="brand"><span class="brand-mark">C</span>Commish</div>
+    <p class="lede">A few minutes to set up your free test campaign and pick how we partner.</p>
+    <ul class="snav" id="snav">
+      <li data-go="0"><span class="bdg">1</span><span class="st">About your company</span></li>
+      <li data-go="1"><span class="bdg">2</span><span class="st">Your offer &amp; economics</span></li>
+      <li data-go="2"><span class="bdg">3</span><span class="st">Your ideal customer</span></li>
+      <li data-go="3"><span class="bdg">4</span><span class="st">How we partner</span></li>
+      <li data-go="4"><span class="bdg">5</span><span class="st">Sales process &amp; handoff</span></li>
+      <li data-go="5"><span class="bdg">6</span><span class="st">Proof &amp; assets</span></li>
+      <li data-go="6"><span class="bdg">7</span><span class="st">Sign-off</span></li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="brand mobrand"><span class="brand-mark">C</span>Commish</div>
+      <span class="stepof" id="stepof">Step 1 of 7</span>
+    </div>
+    <div class="pbar"><i id="pbar"></i></div>
+
+    <form id="form" novalidate>
+
+      <!-- 1 -->
+      <section class="sec on" data-step>
+        <span class="kicker">Section 01</span>
+        <h2>About your company</h2>
+        <p class="sub">The basics, so we know who we're representing in the market.</p>
+        <div class="grid2">
+          <div class="field"><label>Company name <span class="req">*</span></label><input required data-q="Company name" placeholder="Acme Co" /></div>
+          <div class="field"><label>Website URL</label><input data-q="Website" placeholder="https://" /></div>
+          <div class="field"><label>Your name &amp; title <span class="req">*</span></label><input required data-q="Contact" placeholder="Jane Doe, Founder" /></div>
+          <div class="field"><label>Best email <span class="req">*</span></label><input required type="email" data-q="Email" placeholder="jane@acme.co" /></div>
+          <div class="field full"><label>In one sentence, what do you do?</label><input data-q="What you do" placeholder="We help X do Y." /></div>
+          <div class="field full"><label>Why do clients choose you over competitors?</label><textarea data-q="Edge" placeholder="Your real edge — speed, price, results, niche expertise…"></textarea></div>
+        </div>
+      </section>
+
+      <!-- 2 -->
+      <section class="sec" data-step>
+        <span class="kicker">Section 02</span>
+        <h2>Your offer &amp; economics</h2>
+        <p class="sub">Performance partnerships live and die on the numbers. This tells us if outbound can move the needle, and what a fair split looks like.</p>
+        <div class="grid2">
+          <div class="field full"><label>What's your core offer / service?</label><input data-q="Offer" placeholder="What we'll be selling on your behalf" /></div>
+          <div class="field"><label>Average deal value <span class="req">*</span></label><input required data-q="Deal value" placeholder="$ one-time or annual" /></div>
+          <div class="field"><label>Revenue type</label><select data-q="Revenue type"><option value="">Select…</option><option>One-time</option><option>Recurring / subscription</option><option>Repeat / reorder</option></select></div>
+          <div class="field"><label>Close rate from a booked meeting <span class="req">*</span></label><input required data-q="Close rate" placeholder="e.g. 20%" /><span class="hint">Roughly how many booked calls turn into deals.</span></div>
+          <div class="field"><label>Typical sales cycle</label><input data-q="Sales cycle" placeholder="e.g. 3 weeks" /></div>
+          <div class="field"><label>Avg customer lifetime / churn</label><input data-q="Retention" placeholder="If recurring — e.g. 18 mo, 4%/mo" /></div>
+          <div class="field"><label>Rough gross margin</label><input data-q="Margin" placeholder="Helps us size a fair share" /></div>
+        </div>
+      </section>
+
+      <!-- 3 -->
+      <section class="sec" data-step>
+        <span class="kicker">Section 03</span>
+        <h2>Your ideal customer</h2>
+        <p class="sub">Who we go after. The sharper this is, the better the meetings.</p>
+        <div class="grid2">
+          <div class="field full"><label>Industries / niches to target <span class="req">*</span></label><input required data-q="Target industries" placeholder="e.g. logistics, dental clinics, SaaS" /></div>
+          <div class="field"><label>Company size</label><input data-q="Company size" placeholder="employees or revenue" /></div>
+          <div class="field"><label>Geography</label><input data-q="Geography" placeholder="US, UK, global…" /></div>
+          <div class="field full"><label>Decision-maker titles</label><input data-q="Titles" placeholder="e.g. Founder, Head of Ops, CFO" /></div>
+          <div class="field full"><label>3 of your best current customers</label><textarea data-q="Best customers" placeholder="We'll model the list on these."></textarea></div>
+          <div class="field full"><label>Anyone we should exclude?</label><input data-q="Exclusions" placeholder="Competitors, existing clients, do-not-contact" /></div>
+        </div>
+      </section>
+
+      <!-- 4 — MODELS -->
+      <section class="sec" data-step>
+        <span class="kicker">Section 04</span>
+        <h2>How we partner</h2>
+        <p class="sub">Same outbound engine, three ways to structure it. Pick the one that fits — or let us recommend on the call.</p>
+        <div class="models" id="models">
+          <div class="mcard" data-model="Commission per deal">
+            <div class="tick">✓</div><div class="tg">Model 01</div>
+            <h3>Commission per deal</h3><div class="pay">One-time, on closed deals</div>
+            <p>We book the meetings, you close, you pay a one-time commission. Nothing before, nothing after.</p>
+          </div>
+          <div class="mcard" data-model="Revenue share">
+            <div class="tick">✓</div><div class="tg">Model 02</div>
+            <h3>Revenue share</h3><div class="pay">Ongoing % of revenue</div>
+            <p>No retainer. We take a share of the revenue we generate, for as long as it pays.</p>
+          </div>
+          <div class="mcard" data-model="Equity partner">
+            <div class="tick">✓</div><div class="tg">Model 03</div>
+            <h3>Equity partner</h3><div class="pay">A stake in the business</div>
+            <p>We build and run your outbound growth engine in exchange for equity. Long-term, fully aligned.</p>
+          </div>
+        </div>
+        <div class="pick4" id="pick4" data-model="Not sure — recommend one">Not sure which fits? Tap here and we'll recommend one on the call.</div>
+
+        <!-- conditional: commission -->
+        <div class="cond" id="cond-commission">
+          <div class="grid2">
+            <div class="field"><label>Proposed commission</label><input data-q="Proposed commission" placeholder="% of deal, or flat $ per close" /></div>
+            <div class="field"><label>Paid on</label><select data-q="Commission trigger"><option value="">Select…</option><option>Signed contract</option><option>First payment collected</option></select></div>
+          </div>
+        </div>
+        <!-- conditional: revshare -->
+        <div class="cond" id="cond-revenue">
+          <div class="grid2">
+            <div class="field"><label>Share applies to</label><select data-q="Rev base"><option value="">Select…</option><option>Revenue from accounts you source</option><option>Total revenue of an agreed line</option></select></div>
+            <div class="field"><label>Proposed share %</label><input data-q="Proposed share" placeholder="e.g. 10%" /></div>
+            <div class="field"><label>Duration</label><select data-q="Rev duration"><option value="">Select…</option><option>Life of the account</option><option>Capped (e.g. 24–36 mo)</option></select></div>
+          </div>
+        </div>
+        <!-- conditional: equity -->
+        <div class="cond" id="cond-equity">
+          <div class="grid2">
+            <div class="field"><label>Proposed equity stake</label><input data-q="Proposed equity" placeholder="e.g. 5%" /></div>
+            <div class="field"><label>Structure</label><select data-q="Equity structure"><option value="">Select…</option><option>Equity in existing company</option><option>Joint venture / NewCo</option><option>Advisory-style grant</option></select></div>
+            <div class="field full"><label>Vesting preference</label><input data-q="Vesting" placeholder="Time-based, milestone-based, or hybrid" /></div>
+          </div>
+        </div>
+        <div class="field full" style="margin-top:24px"><label>Anything about terms we should know?</label><textarea data-q="Terms notes" placeholder="Optional"></textarea></div>
+      </section>
+
+      <!-- 5 -->
+      <section class="sec" data-step>
+        <span class="kicker">Section 05</span>
+        <h2>Sales process &amp; handoff</h2>
+        <p class="sub">We generate the meetings; you close them. This is how we hand off cleanly and track what's ours.</p>
+        <div class="grid2">
+          <div class="field"><label>Who runs the booked meetings?</label><input data-q="Who closes" placeholder="You, a rep, a team…" /></div>
+          <div class="field"><label>Calendar link</label><input data-q="Calendar" placeholder="Calendly / scheduling URL" /></div>
+          <div class="field"><label>CRM you use</label><input data-q="CRM" placeholder="For shared visibility &amp; attribution" /></div>
+          <div class="field"><label>Meetings you can handle / week</label><input data-q="Capacity" placeholder="e.g. 10" /></div>
+          <div class="field full"><label>How fast do you follow up with a new lead?</label><input data-q="Follow-up speed" placeholder="Same day is ideal" /></div>
+        </div>
+      </section>
+
+      <!-- 6 -->
+      <section class="sec" data-step>
+        <span class="kicker">Section 06</span>
+        <h2>Proof &amp; assets</h2>
+        <p class="sub">Anything that helps the outbound land. All optional, but more is better.</p>
+        <div class="grid2">
+          <div class="field full"><label>Case studies / testimonials / reviews</label><input data-q="Proof links" placeholder="Links" /></div>
+          <div class="field full"><label>Sales deck or one-pager</label><input data-q="Deck" placeholder="Link" /></div>
+          <div class="field full"><label>Current offers or lead magnets we can use</label><input data-q="Offers" placeholder="Free audit, trial, guarantee…" /></div>
+          <div class="field full"><label>What's worked in past outreach?</label><textarea data-q="Past outreach" placeholder="Angles, subject lines, anything that landed before."></textarea></div>
+        </div>
+      </section>
+
+      <!-- 7 -->
+      <section class="sec" data-step>
+        <span class="kicker">Section 07</span>
+        <h2>Sign-off</h2>
+        <p class="sub">This kicks off your free test campaign. The model and terms get formalized in a short term sheet before any money or equity changes hands.</p>
+        <div class="grid2">
+          <div class="field full"><label>Model you're choosing</label><input id="signModel" data-q="Chosen model" readonly placeholder="Pick one in Section 04" /></div>
+          <div class="field"><label>Full name <span class="req">*</span></label><input required data-q="Sign name" placeholder="Type your full name" /></div>
+          <div class="field"><label>Date <span class="req">*</span></label><input required data-q="Date" id="dateField" placeholder="DD/MM/YYYY" /></div>
+          <div class="field full">
+            <label style="display:flex;gap:11px;align-items:flex-start;font-weight:400;color:var(--muted);font-size:14px">
+              <input type="checkbox" id="agree" required style="width:auto;margin-top:3px" data-q="Agreed" />
+              I understand this starts a free test campaign, and that the partnership model and terms will be confirmed in a Commish term sheet before anything is binding.
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- DONE -->
+      <div class="done" id="done">
+        <div class="seal">✓</div>
+        <h2>You're in.</h2>
+        <p>Thanks — we've got what we need to build your free test campaign. Expect first meetings on your calendar within a few weeks. We'll be in touch to confirm your model and send the term sheet.</p>
+        <div class="summary" id="summary"><h4>Your submission</h4></div>
+        <button type="button" class="btn btn-ghost" id="copyBtn" style="margin-top:18px">Copy my answers</button>
+        <p class="note" id="wireNote">Test build — wire this form to your handler (Tally, Formspark, or your own endpoint) to capture submissions live.</p>
+      </div>
+
+      <!-- NAV -->
+      <div class="nav" id="navrow">
+        <button type="button" class="btn btn-ghost" id="prev" disabled>← Previous</button>
+        <button type="button" class="btn btn-gold" id="next">Next →</button>
+      </div>
+    </form>
+  </main>
+</div>
+
+<script>
+  const secs = [...document.querySelectorAll('[data-step]')];
+  const navItems = [...document.querySelectorAll('#snav li')];
+  const TOTAL = secs.length;
+  let i = 0, chosenModel = '';
+
+  const prev = document.getElementById('prev'),
+        next = document.getElementById('next'),
+        pbar = document.getElementById('pbar'),
+        stepof = document.getElementById('stepof');
+
+  function show(n){
+    secs.forEach((s,k)=>s.classList.toggle('on', k===n));
+    navItems.forEach((li,k)=>{
+      li.classList.toggle('active', k===n);
+      li.classList.toggle('done', k<n);
+    });
+    pbar.style.width = ((n+1)/TOTAL*100)+'%';
+    stepof.textContent = `Step ${n+1} of ${TOTAL}`;
+    prev.disabled = n===0;
+    next.textContent = n===TOTAL-1 ? 'Submit ✓' : 'Next →';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function validate(n){
+    const sec = secs[n];
+    let ok = true, first=null;
+    sec.querySelectorAll('[required]').forEach(el=>{
+      const wrap = el.closest('.field');
+      const empty = el.type==='checkbox' ? !el.checked : !el.value.trim();
+      if(empty){ ok=false; if(wrap) wrap.classList.add('err'); if(!first) first=el; }
+      else if(wrap){ wrap.classList.remove('err'); }
+    });
+    if(first) first.focus();
+    return ok;
+  }
+
+  next.addEventListener('click', ()=>{
+    if(!validate(i)) return;
+    if(i < TOTAL-1){ i++; show(i); }
+    else submit();
+  });
+  prev.addEventListener('click', ()=>{ if(i>0){ i--; show(i);} });
+  navItems.forEach(li=> li.addEventListener('click', ()=>{
+    const go = +li.dataset.go;
+    if(go<=i || validate(i)){ i=go; show(i); }
+  }));
+
+  // model selection
+  const cards = [...document.querySelectorAll('.mcard')];
+  const pick4 = document.getElementById('pick4');
+  const conds = {'Commission per deal':'cond-commission','Revenue share':'cond-revenue','Equity partner':'cond-equity'};
+  function selectModel(name, el){
+    chosenModel = name;
+    cards.forEach(c=>c.classList.toggle('sel', c===el && el.classList.contains('mcard')));
+    pick4.classList.toggle('sel', el===pick4);
+    Object.values(conds).forEach(id=>document.getElementById(id).classList.remove('on'));
+    if(conds[name]) document.getElementById(conds[name]).classList.add('on');
+    document.getElementById('signModel').value = name;
+  }
+  cards.forEach(c=> c.addEventListener('click', ()=>selectModel(c.dataset.model, c)));
+  pick4.addEventListener('click', ()=>selectModel(pick4.dataset.model, pick4));
+
+  // prefill date
+  document.getElementById('dateField').value = new Date().toLocaleDateString('en-GB');
+
+  // submit
+  function collect(){
+    const out=[];
+    document.querySelectorAll('[data-q]').forEach(el=>{
+      let v = el.type==='checkbox' ? (el.checked?'Yes':'No') : el.value.trim();
+      if(v) out.push([el.dataset.q, v]);
+    });
+    return out;
+  }
+  function submit(){
+    if(!validate(TOTAL-1)) return;
+    const data = collect();
+    const sum = document.getElementById('summary');
+    data.forEach(([k,v])=>{
+      const r=document.createElement('div'); r.className='r';
+      r.innerHTML = `<span class="k">${k}</span><span class="v"></span>`;
+      r.querySelector('.v').textContent = v;
+      sum.appendChild(r);
+    });
+    secs.forEach(s=>s.classList.remove('on'));
+    document.getElementById('navrow').style.display='none';
+    document.querySelector('.pbar').style.display='none';
+    stepof.textContent = 'Complete';
+    navItems.forEach(li=>li.classList.add('done'));
+    pbar.style.width='100%';
+    document.getElementById('done').classList.add('on');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', ()=>{
+    const txt = collect().map(([k,v])=>`${k}: ${v}`).join('\n');
+    navigator.clipboard?.writeText(txt).then(()=>{
+      const b=document.getElementById('copyBtn'); b.textContent='Copied ✓';
+      setTimeout(()=>b.textContent='Copy my answers',1600);
+    });
+  });
+
+  show(0);
+</script>
+</body>
+</html>
