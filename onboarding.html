@@ -292,7 +292,7 @@
         <p>Thanks — we've got what we need to build your free test campaign. Expect first meetings on your calendar within a few weeks. We'll be in touch to confirm your model and send the term sheet.</p>
         <div class="summary" id="summary"><h4>Your submission</h4></div>
         <button type="button" class="btn btn-ghost" id="copyBtn" style="margin-top:18px">Copy my answers</button>
-        <p class="note" id="wireNote">Test build — wire this form to your handler (Tally, Formspark, or your own endpoint) to capture submissions live.</p>
+        <p class="note" id="wireNote">Your answers have been sent to the Commish team. We'll be in touch shortly.</p>
       </div>
 
       <!-- NAV -->
@@ -382,6 +382,11 @@
   function submit(){
     if(!validate(TOTAL-1)) return;
     const data = collect();
+    fetch('/api/submit', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({answers: data})
+    }).catch(()=>{});
     const sum = document.getElementById('summary');
     data.forEach(([k,v])=>{
       const r=document.createElement('div'); r.className='r';
