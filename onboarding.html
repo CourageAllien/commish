@@ -285,16 +285,6 @@
         </div>
       </section>
 
-      <!-- DONE -->
-      <div class="done" id="done">
-        <div class="seal">✓</div>
-        <h2>You're in.</h2>
-        <p>Thanks — we've got what we need to build your free test campaign. Expect first meetings on your calendar within a few weeks. We'll be in touch to confirm your model and send the term sheet.</p>
-        <div class="summary" id="summary"><h4>Your submission</h4></div>
-        <button type="button" class="btn btn-ghost" id="copyBtn" style="margin-top:18px">Copy my answers</button>
-        <p class="note" id="wireNote">Your answers have been sent to the Commish team. We'll be in touch shortly.</p>
-      </div>
-
       <!-- NAV -->
       <div class="nav" id="navrow">
         <button type="button" class="btn btn-ghost" id="prev" disabled>← Previous</button>
@@ -379,39 +369,50 @@
     });
     return out;
   }
-  function submit(){
+  async function submit(){
     if(!validate(TOTAL-1)) return;
     const data = collect();
-    fetch('/api/submit', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({answers: data})
-    }).catch(()=>{});
-    const sum = document.getElementById('summary');
-    data.forEach(([k,v])=>{
-      const r=document.createElement('div'); r.className='r';
-      r.innerHTML = `<span class="k">${k}</span><span class="v"></span>`;
-      r.querySelector('.v').textContent = v;
-      sum.appendChild(r);
-    });
-    secs.forEach(s=>s.classList.remove('on'));
-    document.getElementById('navrow').style.display='none';
-    document.querySelector('.pbar').style.display='none';
-    stepof.textContent = 'Complete';
-    navItems.forEach(li=>li.classList.add('done'));
-    pbar.style.width='100%';
-    document.getElementById('done').classList.add('on');
-    window.scrollTo({top:0,behavior:'smooth'});
+    try{ sessionStorage.setItem('commish_onboarding', JSON.stringify(data)); }catch(e){}
+    const nameRow = data.find(([k])=>k==='Sign name') || data.find(([k])=>k==='Contact') || ['',''];
+    const name = nameRow[1] || '';
+    next.disabled = true;
+    next.textContent = 'Sending…';
+    let ok = false;
+    try{
+      const r = await fetch('/api/submit', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({answers: data})
+      });
+      ok = r.ok;
+    }catch(e){ ok = false; }
+    if(ok){
+      try{ sessionStorage.removeItem('commish_onboarding'); }catch(e){}
+      location.href = 'result.html?status=ok&name=' + encodeURIComponent(name);
+    }else{
+      location.href = 'result.html?status=error&name=' + encodeURIComponent(name);
+    }
   }
 
-  document.getElementById('copyBtn').addEventListener('click', ()=>{
-    const txt = collect().map(([k,v])=>`${k}: ${v}`).join('\n');
-    navigator.clipboard?.writeText(txt).then(()=>{
-      const b=document.getElementById('copyBtn'); b.textContent='Copied ✓';
-      setTimeout(()=>b.textContent='Copy my answers',1600);
+  // restore saved answers (e.g. after a failed submit) so nothing is lost
+  function restore(){
+    let saved;
+    try{ saved = JSON.parse(sessionStorage.getItem('commish_onboarding')||'null'); }catch(e){ saved=null; }
+    if(!Array.isArray(saved)) return;
+    const map = new Map(saved);
+    document.querySelectorAll('[data-q]').forEach(el=>{
+      if(el.type==='checkbox'){ el.checked = map.get(el.dataset.q)==='Yes'; }
+      else if(map.has(el.dataset.q)){ el.value = map.get(el.dataset.q); }
     });
-  });
+    const model = map.get('Chosen model');
+    if(model){
+      const card = cards.find(c=>c.dataset.model===model);
+      if(card) selectModel(model, card);
+      else if(model===pick4.dataset.model) selectModel(model, pick4);
+    }
+  }
 
+  restore();
   show(0);
 </script>
 </body>

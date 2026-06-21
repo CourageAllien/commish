@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Commish — Submission</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0E1320;--surface:#19223550;
+    --line:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.14);
+    --gold:#E8B23A;--gold-bright:#F4C95B;--go:#4CC09A;
+    --text:#ECEEF4;--muted:#97A1B4;--faint:#6A7384;--err:#E8736A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{min-height:100vh;display:grid;place-items:center;background:var(--ink);color:var(--text);
+    font-family:"Inter",system-ui,sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;padding:24px}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:radial-gradient(800px 480px at 88% -8%,rgba(232,178,58,.10),transparent 60%),radial-gradient(640px 460px at -5% 8%,rgba(76,192,154,.05),transparent 55%)}
+  h1{font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:800;letter-spacing:-.02em;line-height:1.08;font-size:clamp(28px,5vw,40px)}
+  .brand{display:flex;align-items:center;gap:11px;font-family:"Bricolage Grotesque";font-weight:800;font-size:20px;letter-spacing:-.02em;justify-content:center;margin-bottom:30px}
+  .brand-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#b9831e);display:grid;place-items:center;color:#241a06;font-weight:800;font-size:16px}
+  .card{width:100%;max-width:560px;text-align:center;border:1px solid var(--line);border-radius:20px;
+    background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);padding:46px clamp(22px,5vw,46px);animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .seal{width:70px;height:70px;border-radius:50%;display:grid;place-items:center;font-size:32px;margin:0 auto 22px}
+  .seal.ok{background:rgba(76,192,154,.16);color:var(--go)}
+  .seal.bad{background:rgba(232,115,106,.16);color:var(--err)}
+  .card p{color:var(--muted);margin:14px auto 0;max-width:46ch}
+  .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+  .btn{display:inline-flex;align-items:center;gap:9px;justify-content:center;font-weight:600;font-size:15px;
+    padding:13px 24px;border-radius:11px;border:1px solid transparent;cursor:pointer;transition:.16s;font-family:"Inter"}
+  .btn-gold{background:var(--gold);color:#231a05}
+  .btn-gold:hover{background:var(--gold-bright)}
+  .btn-ghost{border-color:var(--line-strong);color:var(--text);background:transparent}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+  .note{color:var(--faint);font-size:12.5px;margin-top:22px}
+  .note a{color:var(--gold)}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+</style>
+</head>
+<body>
+  <main>
+    <div class="brand"><span class="brand-mark">C</span>Commish</div>
+    <div class="card">
+      <div class="seal" id="seal"></div>
+      <h1 id="title"></h1>
+      <p id="msg"></p>
+      <div class="actions" id="actions"></div>
+      <p class="note" id="note"></p>
+    </div>
+  </main>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const status = params.get('status') === 'ok' ? 'ok' : 'error';
+    const rawName = (params.get('name') || '').trim();
+    const firstName = rawName ? rawName.split(/[ ,]/)[0] : '';
+
+    const seal = document.getElementById('seal');
+    const title = document.getElementById('title');
+    const msg = document.getElementById('msg');
+    const actions = document.getElementById('actions');
+    const note = document.getElementById('note');
+
+    function btn(label, href, kind){
+      const a = document.createElement('a');
+      a.className = 'btn ' + kind;
+      a.href = href;
+      a.textContent = label;
+      return a;
+    }
+
+    if(status === 'ok'){
+      seal.className = 'seal ok';
+      seal.textContent = '✓';
+      title.textContent = firstName ? `You're in, ${firstName}.` : `You're in.`;
+      msg.textContent = "Thanks — we've received your details and we're building your free test campaign. Expect first meetings on your calendar within a few weeks. We'll be in touch to confirm your model and send the term sheet.";
+      actions.appendChild(btn('Back to home', 'index.html', 'btn-gold'));
+    } else {
+      seal.className = 'seal bad';
+      seal.textContent = '!';
+      title.textContent = firstName ? `Sorry ${firstName}, that didn't go through.` : `That didn't go through.`;
+      msg.textContent = "We couldn't submit your details just now. Your answers are saved on this device — tap below to try again. If it keeps failing, email us directly.";
+      actions.appendChild(btn('Try again', 'onboarding.html', 'btn-gold'));
+      actions.appendChild(btn('Back to home', 'index.html', 'btn-ghost'));
+      note.innerHTML = 'Or reach us at <a href="mailto:courage@couragealison.com">courage@couragealison.com</a>';
+    }
+  </script>
+</body>
+</html>
