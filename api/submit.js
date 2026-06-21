@@ -160,6 +160,7 @@ export default async function handler(req, res) {
     if (!Array.isArray(pair) || pair.length < 2) continue;
     const key = pair[0];
     if (typeof key !== 'string' || seen.has(key)) continue;
+    if (!Object.prototype.hasOwnProperty.call(SCHEMA, key)) continue;
     const spec = SCHEMA[key];
     if (!spec) continue;
     const val = clean(spec, pair[1]);
